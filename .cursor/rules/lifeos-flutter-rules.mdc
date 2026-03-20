@@ -1,0 +1,305 @@
+---
+description: LifeOS Flutter app architecture, state, UI, and API integration rules
+globs: "lib/**/*.dart"
+alwaysApply: false
+---
+
+# LifeOS Flutter Rules
+
+## Project Context
+
+LifeOS is a personal life management mobile app focused on:
+- task management
+- habit tracking
+- journaling
+- mood tracking
+- productivity insights
+
+The Flutter app must feel modern, structured, calm, and production-ready.
+
+Tech stack:
+- Flutter
+- Riverpod
+- GoRouter
+- Dio
+- Flutter Secure Storage
+
+## Flutter Philosophy
+
+Always generate Flutter code that is:
+- clean
+- scalable
+- feature-based
+- readable
+- typed
+- maintainable
+- mobile-first
+- production-oriented
+
+Do not generate messy demo-style Flutter code.
+Do not generate giant screens or giant providers.
+Do not couple UI directly to raw API maps.
+
+## Folder Structure Rules
+
+Use feature-based architecture.
+
+Preferred structure:
+- `lib/core`
+- `lib/shared`
+- `lib/features/tasks`
+- `lib/features/habits`
+- `lib/features/journal`
+- `lib/features/mood`
+- `lib/features/insights`
+- `lib/features/auth`
+- `lib/features/profile`
+
+Each feature should contain only its own:
+- models
+- repositories
+- providers
+- screens
+- widgets
+
+Keep cross-feature reusable items in `core` or `shared` only when genuinely reusable.
+
+## Riverpod Rules
+
+Use Riverpod consistently.
+
+Rules:
+- keep providers focused
+- separate data state from ephemeral UI state
+- avoid giant all-purpose notifiers
+- use async state cleanly
+- avoid unnecessary global state
+- keep state ownership clear
+
+Prefer small, understandable providers over bloated abstractions.
+
+## Dio / API Rules
+
+Use Dio for API integration.
+
+Rules:
+- centralize Dio configuration
+- centralize base URL and headers
+- attach auth token automatically
+- handle unauthorized responses globally
+- map JSON into typed models
+- keep API service/repository layers away from widgets
+- do not use raw `Map<String, dynamic>` throughout UI
+
+The app should consume backend APIs in a clean, typed way.
+
+## Authentication Rules
+
+Use secure token handling.
+
+Rules:
+- store auth tokens in Flutter Secure Storage
+- restore auth state predictably
+- protect authenticated routes
+- handle token expiration gracefully
+- never hardcode tokens or secrets
+
+Auth flow must feel smooth and reliable.
+
+## Navigation Rules
+
+Use GoRouter.
+
+Rules:
+- route structure must be predictable
+- keep route definitions centralized
+- protect authenticated areas
+- keep redirects clear and maintainable
+- avoid scattered manual navigation hacks
+- name routes consistently
+
+Navigation should support a clean app flow and future scalability.
+
+## Screen Composition Rules
+
+Rules:
+- break large screens into smaller widgets
+- keep widget trees readable
+- prefer stateless widgets when possible
+- use stateful widgets only for true local UI state
+- avoid giant build methods
+- keep feature widgets inside their feature unless reusable
+
+Each screen should be easy to scan and maintain.
+
+## UI State Rules
+
+Handle all main UI states properly:
+- loading
+- empty
+- error
+- success
+- offline where applicable
+
+Do not leave screens blank during async operations.
+Do not expose raw exceptions directly to users.
+
+User-facing messages should be friendly and clear.
+
+## Model Rules
+
+Use typed Dart models.
+
+Rules:
+- model API payloads explicitly
+- support JSON serialization cleanly
+- align field naming with backend where practical
+- avoid passing raw JSON maps through UI layers
+- keep models focused and predictable
+
+## Repository Rules
+
+Repositories should handle:
+- API communication
+- parsing responses
+- returning typed domain data
+
+Repositories should not handle:
+- widget rendering
+- direct snackbar/dialog logic
+- unrelated UI concerns
+
+Keep repositories simple and testable.
+
+## Widget Rules
+
+All widgets must follow these principles:
+- readable
+- reusable when meaningful
+- consistent spacing
+- consistent typography
+- minimal unnecessary nesting
+
+Avoid:
+- huge monolithic widgets
+- duplicated layout patterns
+- magic numbers everywhere
+
+Prefer:
+- shared spacing constants/tokens
+- common reusable UI primitives
+- explicit widget naming
+
+## Form Rules
+
+Forms must be user-friendly.
+
+Rules:
+- validate input properly
+- show clear field-level error states
+- disable submission during loading
+- handle API errors gracefully
+- keep forms visually clean and simple
+
+Examples:
+- login
+- registration
+- create task
+- create habit
+- journal entry
+- mood log
+
+## Error Handling Rules
+
+Rules:
+- show friendly messages
+- do not show backend stack traces
+- provide retry paths where appropriate
+- handle timeout/network failures gracefully
+- design empty/error states as first-class UX
+
+## Performance Rules
+
+Rules:
+- avoid unnecessary rebuilds
+- keep provider scope clean
+- use const widgets when useful
+- paginate long lists when needed
+- avoid loading everything at once
+- write efficient list UIs
+
+Do not over-optimize too early, but do not ignore obvious inefficiencies.
+
+## Code Style Rules
+
+- use clear names
+- keep files focused
+- keep classes small
+- prefer readability over clever tricks
+- avoid duplicated logic
+- comment only when helpful
+- maintain consistent formatting and project structure
+
+## Naming Rules
+
+Use explicit names.
+
+Good examples:
+- `TaskListScreen`
+- `CreateTaskScreen`
+- `HabitRepository`
+- `MoodLogModel`
+- `JournalEntryCard`
+- `AuthNotifier`
+
+Avoid vague names:
+- `DataWidget`
+- `MainProvider`
+- `HelperScreen`
+- `CommonManager`
+
+## Product Behavior Rules
+
+Every Flutter feature must support the LifeOS mission:
+- help users stay organized
+- help users stay consistent
+- help users reflect
+- help users understand patterns
+- help users improve daily routines
+
+Do not generate random screens or decorative features that do not serve the product direction.
+
+## Things Cursor Must Avoid
+
+Do not:
+- mix UI, API, and state logic into one file
+- use raw JSON maps across the UI
+- create giant build methods
+- create giant providers
+- leave loading/error/empty states unhandled
+- create inconsistent navigation patterns
+- build cluttered mobile screens
+- add low-value visual noise
+- generate demo-level architecture
+
+## Definition of Done
+
+A Flutter feature is only complete when:
+- screen architecture is clean
+- providers are well-structured
+- models are typed
+- repository/API flow is clear
+- navigation is integrated correctly
+- loading/error/empty states exist
+- forms are user-friendly
+- code is readable and maintainable
+- feature matches LifeOS product behavior
+
+## Cursor Behavior Rule
+
+When generating Flutter code for LifeOS:
+- think like a senior Flutter product engineer
+- favor clarity over shortcuts
+- keep features modular
+- preserve architectural consistency
+- make the app feel real, polished, and scalable

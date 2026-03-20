@@ -1,0 +1,406 @@
+---
+description: LifeOS developer workflow and implementation discipline rules
+globs: "{app/**/*.php,routes/**/*.php,database/**/*.php,tests/**/*.php,lib/**/*.dart}"
+alwaysApply: false
+---
+
+# LifeOS Developer Workflow Rules
+
+## Purpose
+
+This file defines how Cursor should behave while implementing features for LifeOS.
+
+It is not about product vision or API formatting.
+It is about execution discipline.
+
+Cursor must implement features in a structured, safe, maintainable order without breaking architecture.
+
+---
+
+## Core Workflow Philosophy
+
+When building LifeOS, Cursor must behave like a senior engineer working on a real product.
+
+That means:
+- understand the feature before coding
+- preserve architecture consistency
+- implement in the correct order
+- avoid random file changes
+- avoid breaking existing modules
+- avoid incomplete feature implementation
+- favor maintainability over speed hacks
+
+Do not generate scattered changes without a plan.
+
+---
+
+## Feature Implementation Order
+
+When implementing a new feature, follow this order unless the task clearly requires otherwise:
+
+### Backend-first order
+1. database design
+2. migration
+3. model
+4. relationships
+5. factory/seeder if needed
+6. form request validation
+7. policy/authorization
+8. service/action layer
+9. controller
+10. API resource
+11. routes
+12. tests
+
+### Frontend/mobile order
+1. model/data contract review
+2. repository/API integration
+3. provider/state logic
+4. route integration
+5. screen structure
+6. smaller widgets/components
+7. loading/empty/error states
+8. form polish and UX cleanup
+
+Do not start with UI guesswork while backend contracts are undefined.
+
+---
+
+## Before Writing Code
+
+Before implementing, Cursor should first identify:
+
+- what feature is being built
+- which domain it belongs to
+- what existing modules it affects
+- whether it is backend only, frontend only, or full-stack
+- which files should be added
+- which files should be updated
+- what validation is required
+- what authorization is required
+- what states must exist in the UI
+
+Cursor should think through architecture before changing code.
+
+---
+
+## File Change Discipline
+
+Rules:
+- change only files relevant to the requested feature
+- do not refactor unrelated modules unless necessary
+- do not rename files casually
+- do not restructure the project without clear benefit
+- do not introduce new patterns if an existing project pattern already exists
+
+Every change should feel intentional.
+
+---
+
+## Reuse Before Creating
+
+Before creating new helpers, services, components, or patterns, Cursor should check:
+
+- does something similar already exist?
+- can an existing pattern be reused?
+- can this feature follow the same structure as another module?
+
+Do not duplicate patterns unnecessarily.
+Do not create parallel architectures.
+
+---
+
+## Backend Workflow Rules
+
+When implementing backend features:
+
+### Step 1: Data modeling
+- define the schema clearly
+- use proper foreign keys
+- use explicit columns
+- define casts and relationships properly
+
+### Step 2: Validation
+- create Form Requests for non-trivial endpoints
+- validate all user input
+- validate filters/sorting/pagination when needed
+
+### Step 3: Authorization
+- add policies for user-owned resources
+- verify ownership and access rules
+- protect all authenticated data properly
+
+### Step 4: Business logic
+- use services/actions for multi-step logic
+- keep controllers thin
+- keep models lean
+
+### Step 5: Response shaping
+- use API Resources
+- keep response structures consistent
+- never return raw models directly
+
+### Step 6: Testing
+- test happy path
+- test validation failures
+- test unauthorized/forbidden scenarios
+- test important edge cases
+
+Do not skip essential layers just to finish faster.
+
+---
+
+## Flutter Workflow Rules
+
+When implementing Flutter/mobile features:
+
+### Step 1: Understand API contract
+- know the endpoint shape
+- know the fields
+- know the loading/error states
+
+### Step 2: Build typed data layer
+- create/update models
+- create/update repository methods
+- centralize API calls properly
+
+### Step 3: State management
+- create focused providers/notifiers
+- separate server state from local UI state
+
+### Step 4: Navigation
+- connect routes clearly
+- keep auth redirects safe
+- avoid scattered navigation logic
+
+### Step 5: Screen composition
+- build the main screen
+- break large areas into widgets
+- keep hierarchy clean
+
+### Step 6: UX states
+- loading
+- empty
+- error
+- success feedback where appropriate
+
+### Step 7: Polish
+- spacing consistency
+- copy clarity
+- button states
+- form disable/loading behavior
+
+Do not build screen UIs on top of undefined or messy data contracts.
+
+---
+
+## Full-Stack Feature Rules
+
+If the task is full-stack, Cursor should usually implement in this order:
+
+1. migration/schema
+2. backend model/logic
+3. backend validation/authorization
+4. API response/resource
+5. backend route
+6. Flutter model/repository/provider
+7. Flutter screen/widgets
+8. state handling and UX polish
+
+Do not build both layers in random mixed order.
+
+---
+
+## Safe Editing Rules
+
+When updating existing code:
+
+- preserve working behavior unless change is required
+- do not remove unrelated logic
+- do not silently break public interfaces
+- do not change API payload shape without need
+- do not introduce breaking naming changes casually
+
+When changing a shared contract, update all impacted layers properly.
+
+---
+
+## Refactor Rules
+
+Refactor only when:
+- it clearly improves maintainability
+- it removes duplication
+- it aligns code with project rules
+- it is needed to implement the requested feature safely
+
+Do not refactor large unrelated areas during a focused feature task.
+
+Keep refactors scoped and justified.
+
+---
+
+## Testing Discipline
+
+Cursor should treat testing as part of implementation, not as optional decoration.
+
+Rules:
+- add/update meaningful tests when backend behavior changes
+- do not add fake tests for appearance
+- do not ignore validation/authorization tests
+- do not leave critical logic untested if the project already includes tests
+
+If tests are not being added, code must still be structured to be testable.
+
+---
+
+## Migration Discipline
+
+Rules:
+- migrations should be reversible
+- column names should be explicit
+- constraints should be correct
+- indexes should be intentional
+- nullable fields should be used carefully
+- avoid schema shortcuts that make future logic messy
+
+Do not use vague or weak schema design.
+
+---
+
+## Naming Discipline
+
+Rules:
+- follow existing naming patterns
+- prefer explicit names
+- keep file/class names aligned with responsibility
+- do not invent vague names
+
+Good:
+- `StoreTaskRequest`
+- `TaskResource`
+- `TaskService`
+- `HabitCheckInAction`
+
+Bad:
+- `MainHelper`
+- `DataManager`
+- `CommonUtils`
+- `TaskThing`
+
+---
+
+## Implementation Completeness Rule
+
+A feature is not complete just because the main happy path works.
+
+Cursor must also consider:
+- invalid input
+- unauthorized access
+- empty state
+- loading state
+- failure state
+- data ownership
+- response consistency
+- code readability
+
+Do not leave features half-finished.
+
+---
+
+## Consistency Over Creativity
+
+Cursor should prefer:
+- existing architecture
+- existing conventions
+- existing patterns
+
+over:
+- inventing a new pattern for every module
+- unnecessary abstraction
+- inconsistent implementation style
+
+This project must feel cohesive.
+
+---
+
+## Minimal Surface Area Rule
+
+For each task:
+- touch as few files as reasonably possible
+- add only what the feature truly needs
+- avoid unnecessary dependencies
+- avoid broad side effects
+
+This reduces bugs and keeps the codebase stable.
+
+---
+
+## Comments and Documentation Rule
+
+Rules:
+- prefer self-explanatory code
+- add comments only when logic is not obvious
+- do not over-comment
+- do not generate noisy docblocks everywhere
+- only document what improves maintainability
+
+---
+
+## What Cursor Must Avoid
+
+Do not:
+- start coding before understanding the feature
+- mix unrelated refactors into feature work
+- skip validation
+- skip authorization
+- skip loading/error/empty states
+- create duplicate patterns
+- introduce giant files
+- change public contracts casually
+- create incomplete implementations
+- generate code that looks finished but is architecturally weak
+
+---
+
+## Definition of Done
+
+A feature is only done when:
+
+### Backend
+- schema is correct
+- model is correct
+- validation is correct
+- authorization is correct
+- logic is placed correctly
+- response shape is correct
+- route is integrated
+- tests are updated when appropriate
+
+### Flutter
+- model is typed
+- repository is correct
+- provider is focused
+- screen is integrated
+- UI states are handled
+- UX is polished
+- naming and architecture are consistent
+
+### Overall
+- feature matches LifeOS product vision
+- code is maintainable
+- no unnecessary files or abstractions were introduced
+- the implementation feels like part of one unified system
+
+---
+
+## Cursor Behavior Rule
+
+When implementing LifeOS features, Cursor must behave like a disciplined senior engineer:
+
+- understand first
+- implement in order
+- preserve architecture
+- keep changes scoped
+- finish all essential layers
+- optimize for maintainability
+- protect product consistency

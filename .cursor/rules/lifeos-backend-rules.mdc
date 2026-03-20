@@ -1,0 +1,389 @@
+---
+description: LifeOS Laravel backend architecture, API, and security standards
+globs: "{app/**/*.php,routes/**/*.php,database/**/*.php,tests/**/*.php}"
+alwaysApply: false
+---
+
+# LifeOS Backend Rules
+
+## Project Context
+
+LifeOS is a full-stack personal life management platform.
+
+Core domains:
+- tasks
+- habits
+- journal
+- mood tracking
+- productivity insights
+
+Backend must be built as a clean, scalable, production-ready Laravel API.
+
+Tech stack:
+- Laravel 12
+- PHP 8.3
+- MySQL
+- Laravel Sanctum
+- Form Requests
+- API Resources
+- Policies
+- Service classes
+
+## Backend Philosophy
+
+Always generate backend code that is:
+- production-ready
+- secure
+- modular
+- readable
+- RESTful
+- maintainable
+- consistent
+
+Do not generate hacky or shortcut-based code.
+Do not over-engineer.
+Prefer clean and explicit architecture.
+
+## Architecture Rules
+
+Use structured Laravel architecture.
+
+Preferred folders:
+- `app/Models`
+- `app/Http/Controllers/API`
+- `app/Http/Requests`
+- `app/Http/Resources`
+- `app/Policies`
+- `app/Services`
+- `app/Enums`
+- `database/migrations`
+- `database/factories`
+- `database/seeders`
+
+Rules:
+- Controllers must stay thin
+- Business logic must not live in controllers
+- Complex workflows should move to services
+- Validation must use Form Requests
+- Response formatting must use API Resources
+- Authorization must use policies or gates
+
+## API Rules
+
+LifeOS backend is API-first.
+
+Rules:
+- Use RESTful route naming
+- Use clear endpoint naming
+- Use correct HTTP methods
+- Return consistent JSON responses
+- Never return raw Eloquent models directly
+- Always validate incoming data
+- Handle failure states cleanly
+
+Preferred success response:
+```json
+{
+  "message": "Task created successfully.",
+  "data": {}
+}
+```
+
+Preferred paginated response:
+```json
+{
+  "message": "Tasks fetched successfully.",
+  "data": [],
+  "meta": {},
+  "links": {}
+}
+```
+
+Use proper HTTP status codes:
+- `200 OK`
+- `201 Created`
+- `204 No Content`
+- `401 Unauthorized`
+- `403 Forbidden`
+- `404 Not Found`
+- `422 Unprocessable Entity`
+
+## Route Rules
+
+Use resource-oriented route design.
+
+Examples:
+- `/api/tasks`
+- `/api/habits`
+- `/api/journal-entries`
+- `/api/mood-logs`
+- `/api/insights`
+
+Avoid badly named routes such as:
+- `/api/getTasks`
+- `/api/createHabitNow`
+- `/api/userMoodDataList`
+
+Use action-style routes only when truly needed, such as:
+- `/api/tasks/{task}/complete`
+- `/api/habits/{habit}/check-in`
+
+## Controller Rules
+
+Controllers should only handle:
+- request input
+- authorization trigger
+- delegation to services/actions
+- returning resources/responses
+
+Do not place:
+- heavy query logic
+- calculations
+- multi-step workflows
+- data transformation logic
+inside controllers
+
+Keep controller methods concise and predictable.
+
+## Validation Rules
+
+Use Laravel Form Requests for all non-trivial endpoints.
+
+Rules:
+- keep validation explicit
+- use typed, readable rules
+- add custom messages when helpful
+- do not rely only on frontend validation
+- validate enums, dates, booleans, arrays, and nested structures properly
+
+Examples of fields to validate carefully:
+- due dates
+- priorities
+- mood values
+- habit frequency
+- journal content
+- pagination/filter inputs
+
+## Authorization Rules
+
+Every user-owned resource must be protected.
+
+Rules:
+- use policies for view, update, delete, and other restricted actions
+- never trust ownership from request payload
+- always verify model ownership on protected resources
+- user data must never leak across accounts
+
+Protected resource examples:
+- tasks
+- habits
+- journal entries
+- mood logs
+- profile data
+- personal insights
+
+## Model Rules
+
+Models must remain lean.
+
+Allowed in models:
+- relationships
+- casts
+- scopes
+- accessors/mutators when clearly useful
+- small helper methods
+
+Avoid in models:
+- long business workflows
+- request-aware logic
+- controller-style operations
+- unrelated utility methods
+
+Use:
+- proper `$fillable` or guarded strategy
+- casts for dates, booleans, enums, JSON
+- relationship naming consistency
+
+## Database Rules
+
+Schema must be explicit and well-structured.
+
+Rules:
+- use foreign keys
+- use indexes where appropriate
+- use constrained relationships
+- only use nullable columns when necessary
+- avoid vague flexible schema design
+- avoid unnecessary polymorphic design unless clearly justified
+- keep migrations reversible and clean
+
+Examples:
+- tasks belong to users
+- habits belong to users
+- journal entries belong to users
+- mood logs belong to users
+
+## Service Layer Rules
+
+Use services when:
+- logic spans multiple models
+- multiple database writes happen together
+- workflows are complex
+- logic is reused across features
+- feature logic is not controller responsibility
+
+Examples:
+- task completion workflow
+- habit streak calculation
+- insight generation
+- mood summary aggregation
+- daily summary generation
+
+Service naming should be explicit:
+- `TaskService`
+- `HabitStreakService`
+- `InsightGenerationService`
+
+Avoid vague names:
+- `AppHelper`
+- `MainManager`
+- `GeneralService`
+
+## Transaction Rules
+
+Use database transactions when multiple related writes must succeed together.
+
+Examples:
+- create/update parent and children records
+- mark habit completion and update streak
+- generate insight records from multiple source records
+
+Do not use transactions where unnecessary, but do use them when consistency matters.
+
+## Query Rules
+
+Rules:
+- eager load relations when needed
+- avoid N+1 queries
+- paginate large lists
+- keep query logic readable
+- use query scopes when they improve clarity
+- do not over-optimize prematurely
+- do not write wasteful queries
+
+Filtering and sorting should be explicit and safe.
+
+## Security Rules
+
+Backend security is mandatory.
+
+Rules:
+- authenticate protected routes with Sanctum
+- validate and sanitize input
+- never expose internal-only fields
+- never trust client ownership fields
+- secure file upload flows
+- protect mass assignment
+- use environment variables for secrets
+- do not hardcode credentials or tokens
+
+## Testing Rules
+
+Backend features should be testable and preferably covered.
+
+Prefer:
+- Feature tests for API endpoints
+- Unit tests for isolated services/calculators
+- Database assertions for persistence flows
+
+Test:
+- successful requests
+- validation failures
+- unauthorized access
+- forbidden access
+- not found cases
+- edge-case business logic
+
+Do not create fake or meaningless tests only for coverage.
+
+## Seeder and Factory Rules
+
+Seeders and factories must generate realistic data.
+
+Rules:
+- create believable demo data
+- keep factories reusable
+- support portfolio-quality product demos
+- avoid nonsense/random-looking data for key product entities
+
+Demo data should help showcase:
+- active tasks
+- ongoing habits
+- meaningful journal entries
+- mood history
+- useful insight patterns
+
+## Naming Rules
+
+Use clear and descriptive names.
+
+Good examples:
+- `StoreTaskRequest`
+- `UpdateHabitRequest`
+- `JournalEntryResource`
+- `MoodLogPolicy`
+- `HabitStreakService`
+
+Avoid vague names:
+- `Helper`
+- `Processor`
+- `Handler`
+- `CommonService`
+
+## Clean Code Rules
+
+- methods should do one clear thing
+- avoid deeply nested logic
+- prefer early returns
+- extract repeated logic
+- keep classes focused
+- prioritize readability over cleverness
+- add comments only when they genuinely help
+
+## Things Cursor Must Avoid
+
+Do not:
+- put business logic in controllers
+- skip validation
+- skip authorization
+- return raw models directly
+- create inconsistent JSON responses
+- create giant god classes
+- create unnecessary abstraction
+- leak user data across accounts
+- use vague naming
+- create fake placeholder core logic
+
+## Definition of Done
+
+A backend feature is only complete when:
+- migration is correct
+- model is correct
+- routes are correct
+- controller is clean
+- request validation exists
+- authorization is enforced
+- resource response is consistent
+- service logic is in the right place
+- database integrity is preserved
+- code is readable and maintainable
+
+## Cursor Behavior Rule
+
+When generating backend code for LifeOS:
+- think like a senior Laravel engineer
+- preserve architecture consistency
+- favor maintainability
+- keep APIs predictable
+- keep user data secure
+- write code that is portfolio-quality and production-oriented

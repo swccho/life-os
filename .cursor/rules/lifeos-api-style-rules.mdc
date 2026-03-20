@@ -1,0 +1,633 @@
+---
+description: LifeOS API style, response format, naming, and consistency rules
+globs: "{app/**/*.php,routes/**/*.php,tests/**/*.php}"
+alwaysApply: false
+---
+
+# LifeOS API Style Rules
+
+## Purpose
+
+This file defines the API consistency rules for LifeOS.
+
+All backend endpoints must follow the same standards for:
+- route naming
+- JSON response shape
+- status codes
+- validation error handling
+- pagination structure
+- filtering/sorting conventions
+- resource naming
+- action naming
+
+The goal is to make the API feel predictable, clean, and production-ready.
+
+---
+
+## API Philosophy
+
+LifeOS APIs must be:
+- RESTful
+- consistent
+- predictable
+- user-safe
+- easy for Flutter to consume
+- easy to extend later
+
+Do not generate endpoints with inconsistent patterns.
+Do not mix multiple response styles across modules.
+
+---
+
+## Global Response Rule
+
+Every successful API response should follow a consistent top-level structure.
+
+Preferred structure:
+
+```json
+{
+  "message": "Tasks fetched successfully.",
+  "data": []
+}
+```
+
+If extra metadata exists:
+
+```json
+{
+  "message": "Tasks fetched successfully.",
+  "data": [],
+  "meta": {},
+  "links": {}
+}
+```
+
+Optional additional keys may include:
+
+* `meta`
+* `links`
+
+Do not add random top-level keys unless clearly justified.
+
+---
+
+## Success Response Rules
+
+### Standard Fetch Response
+
+```json
+{
+  "message": "Tasks fetched successfully.",
+  "data": []
+}
+```
+
+### Single Resource Response
+
+```json
+{
+  "message": "Task fetched successfully.",
+  "data": {}
+}
+```
+
+### Create Response
+
+```json
+{
+  "message": "Task created successfully.",
+  "data": {}
+}
+```
+
+Status code:
+
+* `201 Created`
+
+### Update Response
+
+```json
+{
+  "message": "Task updated successfully.",
+  "data": {}
+}
+```
+
+Status code:
+
+* `200 OK`
+
+### Delete Response
+
+Preferred:
+
+* `200 OK` with message and optional lightweight data
+
+```json
+{
+  "message": "Task deleted successfully.",
+  "data": null
+}
+```
+
+Alternative:
+
+* `204 No Content` only when the project is consistently using it for deletes
+
+Do not mix delete response styles randomly.
+
+---
+
+## Error Response Rules
+
+### Validation Error Response
+
+Use Laravel validation behavior unless project-wide customization exists.
+Validation responses must be clean and predictable.
+
+Preferred structure:
+
+```json
+{
+  "message": "The given data was invalid.",
+  "errors": {
+    "title": ["The title field is required."]
+  }
+}
+```
+
+Rules:
+
+* keep field errors grouped under `errors`
+* do not invent custom validation formats unless applied globally
+* keep messages human-readable
+
+---
+
+### Unauthorized Response
+
+```json
+{
+  "message": "Unauthenticated."
+}
+```
+
+Status code:
+
+* `401 Unauthorized`
+
+---
+
+### Forbidden Response
+
+```json
+{
+  "message": "You do not have permission to perform this action."
+}
+```
+
+Status code:
+
+* `403 Forbidden`
+
+---
+
+### Not Found Response
+
+```json
+{
+  "message": "Task not found."
+}
+```
+
+Status code:
+
+* `404 Not Found`
+
+---
+
+### Generic Server Error Response
+
+```json
+{
+  "message": "Something went wrong."
+}
+```
+
+Status code:
+
+* `500 Internal Server Error`
+
+Do not expose stack traces or internal exception details to API consumers.
+
+---
+
+## Resource Rules
+
+Never return raw Eloquent models directly.
+
+Always use:
+
+* API Resources for single items
+* API Resource Collections for lists when needed
+
+Rules:
+
+* output only intended client-facing fields
+* hide internal-only fields
+* keep field naming stable
+* shape nested data intentionally
+
+---
+
+## Pagination Rules
+
+Paginated endpoints must return:
+
+```json
+{
+  "message": "Tasks fetched successfully.",
+  "data": [],
+  "meta": {
+    "current_page": 1,
+    "from": 1,
+    "last_page": 5,
+    "path": "https://example.com/api/tasks",
+    "per_page": 15,
+    "to": 15,
+    "total": 75
+  },
+  "links": {
+    "first": "https://example.com/api/tasks?page=1",
+    "last": "https://example.com/api/tasks?page=5",
+    "prev": null,
+    "next": "https://example.com/api/tasks?page=2"
+  }
+}
+```
+
+Rules:
+
+* paginate large lists
+* do not return huge unpaginated collections by default
+* keep pagination structure consistent across modules
+
+---
+
+## Route Naming Rules
+
+Use plural resource names for collections.
+
+Good:
+
+* `/api/tasks`
+* `/api/habits`
+* `/api/journal-entries`
+* `/api/mood-logs`
+* `/api/insights`
+
+Single item:
+
+* `/api/tasks/{task}`
+* `/api/habits/{habit}`
+
+Avoid:
+
+* `/api/getTasks`
+* `/api/task-list`
+* `/api/userHabitsData`
+* `/api/create-journal-entry-now`
+
+---
+
+## Nested Route Rules
+
+Only use nested routes when relationship context matters.
+
+Good examples:
+
+* `/api/projects/{project}/tasks`
+* `/api/habits/{habit}/logs`
+
+Do not over-nest routes unnecessarily.
+
+Avoid deep nesting like:
+
+* `/api/users/{user}/habits/{habit}/logs/{log}/details`
+
+Prefer simpler route design.
+
+---
+
+## Action Route Rules
+
+Use action routes only for domain-specific operations that do not fit standard CRUD cleanly.
+
+Good examples:
+
+* `POST /api/tasks/{task}/complete`
+* `POST /api/habits/{habit}/check-in`
+* `POST /api/auth/logout`
+
+Rules:
+
+* action name should be clear
+* action route should represent a real domain action
+* avoid inventing unnecessary action endpoints when update can handle it cleanly
+
+---
+
+## Query Parameter Rules
+
+Use query parameters for:
+
+* filtering
+* sorting
+* searching
+* pagination
+
+Examples:
+
+* `/api/tasks?status=completed`
+* `/api/tasks?priority=high`
+* `/api/tasks?sort=due_date`
+* `/api/tasks?direction=asc`
+* `/api/journal-entries?search=gratitude`
+
+Rules:
+
+* validate filter inputs
+* validate sort fields where needed
+* do not allow unsafe arbitrary sort injection
+* keep query parameter naming simple and consistent
+
+---
+
+## Filtering Rules
+
+Filtering must be explicit and predictable.
+
+Good examples:
+
+* `status`
+* `priority`
+* `date`
+* `from`
+* `to`
+* `search`
+
+Avoid inconsistent alternatives for the same concept across modules.
+
+Example:
+
+* do not use `q` in one endpoint and `search_term` in another unless there is a strong reason
+
+Prefer one standard:
+
+* `search`
+
+---
+
+## Sorting Rules
+
+Use:
+
+* `sort`
+* `direction`
+
+Example:
+
+* `/api/tasks?sort=due_date&direction=asc`
+
+Rules:
+
+* whitelist sortable columns
+* do not trust arbitrary client sort fields
+* default sorting should be defined clearly
+
+---
+
+## Boolean and Enum Rules
+
+Boolean fields should be returned as real booleans:
+
+* `true`
+* `false`
+
+Do not return:
+
+* `"1"`
+* `"0"`
+* `"true"`
+* `"false"`
+
+Enum-like fields must be consistent.
+
+Examples:
+
+* `priority`: `low`, `medium`, `high`
+* `status`: `pending`, `completed`
+
+Do not mix naming styles like:
+
+* `in_progress`
+* `InProgress`
+* `IN-PROGRESS`
+
+Choose one format and keep it consistent.
+
+---
+
+## Date/Time Rules
+
+Dates and times should be consistent across the API.
+
+Preferred:
+
+* ISO 8601-compatible datetime strings for timestamps
+* `Y-m-d` for date-only values when appropriate
+
+Examples:
+
+* `2026-03-20`
+* `2026-03-20T14:30:00Z`
+
+Rules:
+
+* do not mix random date formats
+* date field naming should be explicit:
+
+  * `due_date`
+  * `completed_at`
+  * `created_at`
+  * `updated_at`
+
+---
+
+## Field Naming Rules
+
+Use snake_case in API responses unless the project deliberately standardizes otherwise.
+
+Good examples:
+
+* `due_date`
+* `is_completed`
+* `created_at`
+* `updated_at`
+* `mood_value`
+
+Rules:
+
+* keep naming consistent across all modules
+* avoid mixing snake_case and camelCase in API payloads
+
+---
+
+## Message Rules
+
+Success and error messages should be:
+
+* short
+* clear
+* human-readable
+* consistent
+
+Good examples:
+
+* `Task created successfully.`
+* `Habit updated successfully.`
+* `Journal entry deleted successfully.`
+* `You do not have permission to perform this action.`
+
+Avoid:
+
+* overly technical messages
+* inconsistent tone
+* vague one-word responses
+
+---
+
+## Auth Endpoint Rules
+
+Use clear auth routes.
+
+Examples:
+
+* `POST /api/login`
+* `POST /api/register`
+* `POST /api/logout`
+* `GET /api/user`
+
+Rules:
+
+* auth responses should follow the same response shape
+* token handling should be explicit
+* authenticated user payload should be resource-based
+
+Example:
+
+```json
+{
+  "message": "Login successful.",
+  "data": {
+    "user": {},
+    "token": "..."
+  }
+}
+```
+
+---
+
+## Empty Data Rules
+
+When there is no data:
+
+* return empty arrays for collections
+* return `null` only when a nullable single value is truly intended
+
+Examples:
+
+* list endpoint with no records: `"data": []`
+* deleted item response: `"data": null`
+
+Do not return inconsistent empty values.
+
+Avoid:
+
+* `{}`
+* `""`
+* `"No data"`
+
+---
+
+## API Versioning Rule
+
+If versioning is introduced later, structure it intentionally.
+
+Example:
+
+* `/api/v1/tasks`
+
+Until then, keep routes clean and ready for future versioning.
+
+Do not randomly mix versioned and unversioned endpoints.
+
+---
+
+## Consistency Rule Across Modules
+
+Tasks, habits, journal, mood, profile, and insights must all follow the same API style.
+
+Do not let each module invent its own:
+
+* response structure
+* naming convention
+* pagination shape
+* filtering format
+* message style
+
+Consistency is mandatory.
+
+---
+
+## Things Cursor Must Avoid
+
+Do not:
+
+* return raw models directly
+* create inconsistent top-level JSON structures
+* mix camelCase and snake_case in API responses
+* use vague route names
+* create random action endpoints
+* expose internal exception details
+* return huge unpaginated datasets by default
+* use inconsistent date formats
+* create different pagination styles per module
+
+---
+
+## Definition of Done
+
+An API endpoint is only complete when:
+
+* route naming is correct
+* request validation exists
+* response format is consistent
+* status code is correct
+* resource transformation is used
+* filtering/sorting is safe
+* pagination is correct when needed
+* naming matches project conventions
+* error handling is clean
+
+---
+
+## Cursor Behavior Rule
+
+When generating or editing LifeOS API endpoints:
+
+* think like a senior backend API engineer
+* protect consistency aggressively
+* prioritize predictability for the Flutter app
+* make every endpoint feel like part of one unified product

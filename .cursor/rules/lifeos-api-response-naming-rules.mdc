@@ -1,0 +1,182 @@
+---
+description: LifeOS Laravel API response contract and naming convention rules
+globs: "{app/**/*.php,routes/**/*.php,tests/**/*.php}"
+alwaysApply: false
+---
+
+# LifeOS API Response & Naming Rules
+
+## Purpose
+
+Enforce strict API response consistency and naming conventions across the Laravel backend.
+
+Goals:
+- predictable frontend integration
+- stable contracts for Flutter clients
+- cleaner tests and documentation
+- lower maintenance cost
+
+## Canonical API Response Shape
+
+All API responses should follow a stable envelope.
+
+Success (single resource):
+```json
+{
+  "message": "Task fetched successfully.",
+  "data": {}
+}
+```
+
+Success (collection):
+```json
+{
+  "message": "Tasks fetched successfully.",
+  "data": []
+}
+```
+
+Success (paginated):
+```json
+{
+  "message": "Tasks fetched successfully.",
+  "data": [],
+  "meta": {},
+  "links": {}
+}
+```
+
+Validation error:
+```json
+{
+  "message": "Validation failed.",
+  "errors": {
+    "title": ["The title field is required."]
+  }
+}
+```
+
+General error:
+```json
+{
+  "message": "Unable to process request."
+}
+```
+
+## Response Rules
+
+- Always include `message` for user-facing context.
+- Use `data` for success payloads only.
+- Use `errors` only for validation-style failures.
+- Keep key names stable across all endpoints.
+- Do not return raw models, hidden fields, or internal debug payloads.
+- Use API Resources for all model output formatting.
+- Keep message tone concise, clear, and non-technical.
+
+## HTTP Status Code Rules
+
+Use exact status semantics:
+- `200` for successful fetch/update/delete-with-body operations
+- `201` for successful creates
+- `204` for successful actions with no response body
+- `401` when unauthenticated
+- `403` when authenticated but forbidden
+- `404` when resource not found or inaccessible by ownership scope
+- `422` for validation failures
+- `500` for unexpected server failures (with generic message)
+
+Never return `200` for failed outcomes.
+
+## Resource Naming (Domain)
+
+Use domain language that matches product features:
+- Task / Tasks
+- Habit / Habits
+- JournalEntry / JournalEntries
+- MoodLog / MoodLogs
+- Insight / Insights
+
+Avoid synonyms for the same concept in different layers.
+Example: do not mix `note`, `journal`, and `entry` for the same resource.
+
+## Endpoint Naming Rules
+
+Use kebab-case, plural nouns, and RESTful paths:
+- `/api/tasks`
+- `/api/habits`
+- `/api/journal-entries`
+- `/api/mood-logs`
+- `/api/insights`
+
+Nested endpoints should remain explicit:
+- `/api/habits/{habit}/check-ins`
+- `/api/tasks/{task}/subtasks`
+
+Action endpoints are allowed only for non-CRUD actions:
+- `/api/tasks/{task}/complete`
+- `/api/habits/{habit}/check-in`
+
+Avoid:
+- `/api/getTasks`
+- `/api/createMoodLog`
+- `/api/userInsightsList`
+
+## Class Naming Rules
+
+Use explicit class names per Laravel layer:
+- Requests: `StoreTaskRequest`, `UpdateHabitRequest`
+- Resources: `TaskResource`, `JournalEntryResource`
+- Policies: `TaskPolicy`, `MoodLogPolicy`
+- Controllers: `TaskController`, `HabitCheckInController`
+- Services: `TaskService`, `InsightGenerationService`
+- Enums: `TaskPriority`, `MoodLevel`
+
+Avoid vague names:
+- `Helper`
+- `Manager`
+- `Processor`
+- `CommonService`
+
+## Field Naming Rules
+
+Use `snake_case` in API payload keys unless legacy constraints exist.
+
+Prefer:
+- `due_date`
+- `is_completed`
+- `completed_at`
+- `mood_level`
+- `created_at`
+- `updated_at`
+
+Rules:
+- booleans should read like booleans (`is_*`, `has_*`)
+- timestamps should use `_at`
+- IDs should use `_id`
+- arrays should be plural nouns
+- enum fields should be explicit and documented by allowed values
+
+## Message Naming Rules
+
+Use consistent verb patterns:
+- `"Task created successfully."`
+- `"Tasks fetched successfully."`
+- `"Task updated successfully."`
+- `"Task deleted successfully."`
+
+Failure messages should be calm and generic:
+- `"Validation failed."`
+- `"Unauthorized."`
+- `"Forbidden."`
+- `"Resource not found."`
+- `"Unable to process request."`
+
+Do not expose SQL errors, stack traces, or internal exception messages.
+
+## Cursor Enforcement Behavior
+
+When generating Laravel endpoints for LifeOS:
+- apply this response envelope by default
+- standardize endpoint/resource names before writing code
+- preserve naming consistency with existing domain language
+- prefer API Resources + Form Requests + Policies for contract stability

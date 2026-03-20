@@ -1,0 +1,353 @@
+---
+description: LifeOS product vision, UX tone, and UI consistency standards
+globs: "lib/**/*.dart"
+alwaysApply: false
+---
+
+# LifeOS Product & UI Rules
+
+## Product Identity
+
+LifeOS is not just a productivity app.
+
+It is a personal life management platform designed to help users:
+- organize daily life
+- build consistency
+- reflect on habits and moods
+- improve productivity
+- gain useful personal insights
+
+The product should feel:
+- calm
+- modern
+- thoughtful
+- motivating
+- structured
+- human
+
+## Product Vision
+
+Core mission:
+> Help users become more consistent, mindful, and productive through structured daily tracking and meaningful insights.
+
+Every feature and UI decision must support this mission.
+
+Do not add features that feel random, noisy, or disconnected from the LifeOS purpose.
+
+## Core Experience Principles
+
+LifeOS should feel like:
+- a trusted personal system
+- a focused daily companion
+- a clean and premium mobile product
+- something users want to open every day
+
+The app must not feel:
+- stressful
+- cluttered
+- childish
+- overly gamified
+- visually noisy
+- enterprise-heavy
+
+## UI Philosophy
+
+All UI must be:
+- clean
+- spacious
+- calm
+- clear
+- modern
+- mobile-first
+- premium but simple
+
+Prefer:
+- strong visual hierarchy
+- soft cards
+- clear sections
+- restrained color usage
+- consistent spacing
+- obvious actions
+- readable typography
+
+Avoid:
+- over-decoration
+- harsh visual density
+- too many colors
+- excessive borders
+- inconsistent spacing
+- large blocks of unstructured content
+
+## Design Tone
+
+LifeOS should visually communicate:
+- clarity
+- balance
+- momentum
+- self-improvement
+- personal care
+
+The interface should feel emotionally supportive, not cold or mechanical.
+
+## Screen Design Rules
+
+Every screen should have:
+- one clear purpose
+- strong information hierarchy
+- obvious primary action
+- breathing room
+- clean spacing
+- clear state handling
+
+Every screen must account for:
+- empty state
+- loading state
+- error state
+- success state where relevant
+
+Do not create screens that dump too much information at once.
+
+## Mobile-First Rules
+
+This is primarily a mobile product.
+
+Rules:
+- optimize layout for small screens first
+- keep interactions thumb-friendly
+- avoid cramped layouts
+- prioritize quick scanning
+- reduce friction for repeated daily actions
+
+Key actions such as logging mood, completing a habit, writing a journal entry, or adding a task must feel fast and effortless.
+
+## Component Rules
+
+Components should be:
+- reusable when meaningful
+- visually consistent
+- minimal
+- easy to understand
+
+Preferred reusable components:
+- cards
+- section headers
+- progress widgets
+- list items
+- chips/tags
+- empty states
+- loading placeholders
+- buttons
+- input fields
+
+Do not create too many one-off component styles.
+
+## Typography Rules
+
+Use typography to create hierarchy.
+
+Rules:
+- titles should be clear and strong
+- section labels should be readable
+- secondary text should be subtle but legible
+- body text must be easy to read
+- avoid too many text sizes in one screen
+- avoid weak hierarchy
+
+Text should always feel deliberate and calm.
+
+## Spacing Rules
+
+Spacing must be consistent.
+
+Rules:
+- use a predictable spacing system
+- give content room to breathe
+- separate sections clearly
+- avoid crowded cards and lists
+- avoid arbitrary spacing choices
+
+Good spacing is part of the premium feel.
+
+## Color Rules
+
+Use restrained color intentionally.
+
+Rules:
+- keep palette minimal
+- use color to support hierarchy and meaning
+- avoid rainbow-style UI
+- mood colors can be expressive but still controlled
+- status colors should be consistent
+- do not let color overwhelm the experience
+
+The overall product should still feel calm.
+
+## Interaction Rules
+
+Interactions should be:
+- smooth
+- obvious
+- low-friction
+- supportive
+
+Prefer:
+- clear tap targets
+- fast flows
+- useful confirmations
+- predictable gestures
+- minimal cognitive load
+
+Avoid:
+- overcomplicated multi-step flows
+- hidden actions
+- confusing gestures
+- too many modals for routine tasks
+
+## UX Rules by Domain
+
+### Tasks
+Tasks should feel fast and structured.
+Users should be able to:
+- quickly create tasks
+- see priorities clearly
+- mark completion easily
+- understand what matters today
+
+### Habits
+Habits should feel motivating, not stressful.
+Users should be able to:
+- check in quickly
+- understand streaks easily
+- see progress over time
+- stay encouraged
+
+### Journal
+Journaling should feel private and reflective.
+Users should be able to:
+- write without distraction
+- review past entries comfortably
+- feel safe and focused
+
+### Mood Tracking
+Mood tracking should be simple and lightweight.
+Users should be able to:
+- log mood in seconds
+- review patterns visually
+- understand emotional trends clearly
+
+### Insights
+Insights should feel meaningful and understandable.
+Users should be able to:
+- see useful summaries
+- notice patterns
+- understand progress
+- avoid confusing analytics dashboards
+
+## Empty State Rules
+
+Empty states must be helpful, not generic.
+
+Rules:
+- explain what the feature is for
+- encourage the next action
+- keep tone supportive
+- avoid lifeless placeholders
+
+Example feeling:
+- "Start your first habit"
+- "Write your first journal entry"
+- "Track today's mood to start building insight"
+
+## Loading State Rules
+
+Loading states should feel polished.
+
+Rules:
+- use skeletons or subtle placeholders where appropriate
+- avoid abrupt blank screens
+- keep perceived performance smooth
+
+## Error State Rules
+
+Error states must be calm and clear.
+
+Rules:
+- explain what went wrong simply
+- provide retry when appropriate
+- do not blame the user
+- do not expose technical details
+
+## Content Tone Rules
+
+Microcopy should feel:
+- supportive
+- clear
+- human
+- concise
+
+Avoid:
+- robotic system language
+- overly corporate tone
+- aggressive productivity language
+- guilt-based messaging
+
+LifeOS should encourage progress, not pressure.
+
+## Product Scope Discipline
+
+Only add features that strengthen the core product.
+
+Good feature categories:
+- daily planning
+- routine tracking
+- reflection
+- emotional awareness
+- trend visibility
+- insight generation
+
+Avoid features that dilute focus unless clearly strategic.
+
+## Portfolio Quality Rule
+
+This project must be good enough to showcase publicly.
+
+That means:
+- UI should look intentional and premium
+- feature set should feel real
+- flows should feel thought through
+- screens should look production-ready
+- product direction must stay cohesive
+
+## Things Cursor Must Avoid
+
+Do not:
+- create visually noisy screens
+- add random dashboard clutter
+- use too many colors or styles
+- create inconsistent components
+- make the product feel generic
+- over-gamify the experience
+- use weak spacing or weak hierarchy
+- generate features outside the LifeOS mission
+- create UX that feels stressful or confusing
+
+## Definition of Done
+
+A product/UI feature is complete only when:
+- it supports the LifeOS mission
+- it has a clear user purpose
+- the screen has strong hierarchy
+- spacing and typography feel polished
+- loading/empty/error states exist
+- the flow feels smooth on mobile
+- the UI looks consistent and premium
+- the feature feels useful, not decorative
+
+## Cursor Behavior Rule
+
+When generating product decisions, screens, UX flows, or UI for LifeOS:
+- think like a senior product designer + product engineer
+- protect the product vision
+- prioritize calm clarity
+- make the app feel premium, modern, and human
+- always choose usability over visual noise
