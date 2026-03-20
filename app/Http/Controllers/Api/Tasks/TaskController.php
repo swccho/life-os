@@ -3,47 +3,70 @@
 namespace App\Http\Controllers\Api\Tasks;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Tasks\StoreTaskRequest;
+use App\Http\Requests\Tasks\UpdateTaskRequest;
+use App\Http\Resources\TaskResource;
+use App\Models\Task;
+use App\Services\TaskListingService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
-    public function index(): JsonResponse
+    public function __construct(
+        private readonly TaskListingService $taskListingService
+    ) {}
+
+    public function index(Request $request): JsonResponse
     {
-        return response()->json([
-            'message' => 'Tasks list placeholder.',
-            'data' => [],
-        ]);
+        $this->authorize('viewAny', Task::class);
+
+        $paginator = $this->taskListingService->paginatedForUser($request->user(), $request);
+        $paginator->through(fn (Task $task) => (new TaskResource($task))->resolve());
+
+        return $this->successResponse(
+            $paginator->items(),
+            'Task list fetched successfully.',
+            [
+                'current_page' => $paginator->currentPage(),
+                'last_page' => $paginator->lastPage(),
+                'per_page' => $paginator->perPage(),
+                'total' => $paginator->total(),
+            ]
+        );
     }
 
-    public function store(): JsonResponse
+    public function store(StoreTaskRequest $request): JsonResponse
     {
-        return response()->json([
-            'message' => 'Task store placeholder.',
-            'data' => null,
-        ]);
+        $this->authorize('create', Task::class);
+
+        $task = $request->user()->tasks()->create($request->validated());
+
+        return $this->successResponse(new TaskResource($task), 'Task created successfully.', null, 201);
     }
 
-    public function show(string $id): JsonResponse
+    public function show(Request $request, Task $task): JsonResponse
     {
-        return response()->json([
-            'message' => 'Task show placeholder.',
-            'data' => ['id' => $id],
-        ]);
+        $this->authorize('view', $task);
+
+        return $this->successResponse(new TaskResource($task), 'Task fetched successfully.');
     }
 
-    public function update(string $id): JsonResponse
+    public function update(UpdateTaskRequest $request, Task $task): JsonResponse
     {
-        return response()->json([
-            'message' => 'Task update placeholder.',
-            'data' => ['id' => $id],
-        ]);
+        $this->authorize('update', $task);
+
+        $task->update($request->validated());
+
+        return $this->successResponse(new TaskResource($task->fresh()), 'Task updated successfully.');
     }
 
-    public function destroy(string $id): JsonResponse
+    public function destroy(Request $request, Task $task): JsonResponse
     {
-        return response()->json([
-            'message' => 'Task destroy placeholder.',
-            'data' => ['id' => $id],
-        ]);
+        $this->authorize('delete', $task);
+
+        $task->delete();
+
+        return $this->successResponse(null, 'Task deleted successfully.');
     }
 }

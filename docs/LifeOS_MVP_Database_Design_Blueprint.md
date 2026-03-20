@@ -35,7 +35,7 @@ Columns:
 - `description` (text, nullable)
 - `status` (string, required, default `pending`)
 - `priority` (string, nullable)
-- `due_date` (date, nullable)
+- `due_date` (dateTime, nullable)
 - `completed_at` (timestamp, nullable)
 - `created_at`, `updated_at`
 

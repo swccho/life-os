@@ -54,6 +54,16 @@ In order to ensure that the Laravel community is welcoming to all, please review
 
 If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
+## LifeOS: running automated tests
+
+PHPUnit is configured in [`phpunit.xml`](phpunit.xml) to use **MySQL** with database **`lifeos_testing`** (separate from your app DB in `.env`, e.g. `lifeos_db`). Create that database once (`CREATE DATABASE lifeos_testing;`), then run:
+
+```bash
+php artisan test
+```
+
+If you prefer env-file overrides, copy [`.env.testing.example`](.env.testing.example) to `.env.testing` and set `APP_KEY` (same as `.env` is fine for local testing).
+
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

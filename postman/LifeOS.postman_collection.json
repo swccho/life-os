@@ -1,0 +1,409 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-lifeos-api",
+		"name": "LifeOS API",
+		"description": "Laravel 12 + Sanctum API for LifeOS. Set **baseUrl** (e.g. `http://127.0.0.1:8000` or your Laragon vhost). Run **Register** or **Login** first; the collection saves **accessToken** automatically.\n\nJSON envelope: `{ success, message, data, meta? }`. Errors: `{ success, message, errors? }`.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{accessToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{ "key": "baseUrl", "value": "http://127.0.0.1:8000" },
+		{ "key": "accessToken", "value": "" },
+		{ "key": "taskId", "value": "1" },
+		{ "key": "habitId", "value": "1" },
+		{ "key": "habitLogId", "value": "1" },
+		{ "key": "journalEntryId", "value": "1" },
+		{ "key": "moodEntryId", "value": "1" }
+	],
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if ([200, 201].includes(pm.response.code)) {",
+									"    try {",
+									"        const j = pm.response.json();",
+									"        if (j.data && j.data.token) {",
+									"            pm.collectionVariables.set('accessToken', j.data.token);",
+									"        }",
+									"    } catch (e) {}",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Demo User\",\n  \"email\": \"demo@example.com\",\n  \"password\": \"password123\",\n  \"password_confirmation\": \"password123\"\n}"
+						},
+						"url": "{{baseUrl}}/api/register",
+						"description": "Creates user and returns `data.user` + `data.token`. Throttle: 20/min."
+					}
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    try {",
+									"        const j = pm.response.json();",
+									"        if (j.data && j.data.token) {",
+									"            pm.collectionVariables.set('accessToken', j.data.token);",
+									"        }",
+									"    } catch (e) {}",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"demo@example.com\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": "{{baseUrl}}/api/login",
+						"description": "Returns `data.user` + `data.token`. Throttle: 20/min."
+					}
+				},
+				{
+					"name": "Me",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Accept", "value": "application/json" }],
+						"url": "{{baseUrl}}/api/me",
+						"description": "Returns `data.user` for the Bearer token."
+					}
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Accept", "value": "application/json" }],
+						"url": "{{baseUrl}}/api/logout",
+						"description": "Revokes the current access token."
+					}
+				}
+			]
+		},
+		{
+			"name": "Dashboard",
+			"item": [
+				{
+					"name": "Dashboard summary",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Accept", "value": "application/json" }],
+						"url": "{{baseUrl}}/api/dashboard"
+					}
+				}
+			]
+		},
+		{
+			"name": "Tasks",
+			"item": [
+				{
+					"name": "List tasks",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Accept", "value": "application/json" }],
+						"url": "{{baseUrl}}/api/tasks?status=pending&priority=high&sort=created_at&direction=desc&page=1",
+						"description": "Paginated. Optional: `status` (pending|in_progress|completed), `priority` (low|medium|high), `sort` (due_date|created_at), `direction` (asc|desc)."
+					}
+				},
+				{
+					"name": "Create task",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Ship MVP\",\n  \"description\": \"Backend + API\",\n  \"status\": \"pending\",\n  \"priority\": \"high\",\n  \"due_date\": \"2026-12-31T23:59:59Z\"\n}"
+						},
+						"url": "{{baseUrl}}/api/tasks"
+					}
+				},
+				{
+					"name": "Get task",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Accept", "value": "application/json" }],
+						"url": "{{baseUrl}}/api/tasks/{{taskId}}"
+					}
+				},
+				{
+					"name": "Update task",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Ship MVP (updated)\",\n  \"status\": \"in_progress\"\n}"
+						},
+						"url": "{{baseUrl}}/api/tasks/{{taskId}}"
+					}
+				},
+				{
+					"name": "Delete task",
+					"request": {
+						"method": "DELETE",
+						"header": [{ "key": "Accept", "value": "application/json" }],
+						"url": "{{baseUrl}}/api/tasks/{{taskId}}"
+					}
+				}
+			]
+		},
+		{
+			"name": "Habits",
+			"item": [
+				{
+					"name": "List habits",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Accept", "value": "application/json" }],
+						"url": "{{baseUrl}}/api/habits?page=1",
+						"description": "Paginated (15 per page). Response includes `meta`."
+					}
+				},
+				{
+					"name": "Create habit",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Morning walk\",\n  \"description\": \"30 min\",\n  \"frequency_type\": \"daily\",\n  \"target_count\": 1,\n  \"is_active\": true\n}"
+						},
+						"url": "{{baseUrl}}/api/habits",
+						"description": "`frequency_type`: daily | weekly"
+					}
+				},
+				{
+					"name": "Get habit",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Accept", "value": "application/json" }],
+						"url": "{{baseUrl}}/api/habits/{{habitId}}"
+					}
+				},
+				{
+					"name": "Update habit",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Morning walk (v2)\",\n  \"is_active\": true\n}"
+						},
+						"url": "{{baseUrl}}/api/habits/{{habitId}}"
+					}
+				},
+				{
+					"name": "Delete habit",
+					"request": {
+						"method": "DELETE",
+						"header": [{ "key": "Accept", "value": "application/json" }],
+						"url": "{{baseUrl}}/api/habits/{{habitId}}"
+					}
+				},
+				{
+					"name": "List habit logs",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Accept", "value": "application/json" }],
+						"url": "{{baseUrl}}/api/habits/{{habitId}}/logs?page=1",
+						"description": "Paginated. Unique per habit + logged_date."
+					}
+				},
+				{
+					"name": "Create habit log",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"logged_date\": \"2026-03-20\",\n  \"count\": 1,\n  \"notes\": null\n}"
+						},
+						"url": "{{baseUrl}}/api/habits/{{habitId}}/logs"
+					}
+				},
+				{
+					"name": "Delete habit log",
+					"request": {
+						"method": "DELETE",
+						"header": [{ "key": "Accept", "value": "application/json" }],
+						"url": "{{baseUrl}}/api/habit-logs/{{habitLogId}}"
+					}
+				}
+			]
+		},
+		{
+			"name": "Journal",
+			"item": [
+				{
+					"name": "List journal entries",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Accept", "value": "application/json" }],
+						"url": "{{baseUrl}}/api/journal-entries?entry_date=2026-03-15&from=2026-03-01&to=2026-03-31&page=1",
+						"description": "Optional filters: `entry_date`, `from`, `to`. Paginated."
+					}
+				},
+				{
+					"name": "Create journal entry",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Today\",\n  \"content\": \"Reflection...\",\n  \"entry_date\": \"2026-03-20\"\n}"
+						},
+						"url": "{{baseUrl}}/api/journal-entries"
+					}
+				},
+				{
+					"name": "Get journal entry",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Accept", "value": "application/json" }],
+						"url": "{{baseUrl}}/api/journal-entries/{{journalEntryId}}"
+					}
+				},
+				{
+					"name": "Update journal entry",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Today (edited)\",\n  \"content\": \"Updated text\"\n}"
+						},
+						"url": "{{baseUrl}}/api/journal-entries/{{journalEntryId}}"
+					}
+				},
+				{
+					"name": "Delete journal entry",
+					"request": {
+						"method": "DELETE",
+						"header": [{ "key": "Accept", "value": "application/json" }],
+						"url": "{{baseUrl}}/api/journal-entries/{{journalEntryId}}"
+					}
+				}
+			]
+		},
+		{
+			"name": "Mood",
+			"item": [
+				{
+					"name": "List mood entries",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Accept", "value": "application/json" }],
+						"url": "{{baseUrl}}/api/mood-entries?entry_date=2026-03-20&from=2026-03-01&to=2026-03-31&page=1",
+						"description": "One entry per user per `entry_date` (unique). Paginated."
+					}
+				},
+				{
+					"name": "Create mood entry",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"mood_score\": 4,\n  \"mood_label\": \"calm\",\n  \"notes\": null,\n  \"entry_date\": \"2026-03-20\"\n}"
+						},
+						"url": "{{baseUrl}}/api/mood-entries",
+						"description": "`mood_score`: 1–5"
+					}
+				},
+				{
+					"name": "Get mood entry",
+					"request": {
+						"method": "GET",
+						"header": [{ "key": "Accept", "value": "application/json" }],
+						"url": "{{baseUrl}}/api/mood-entries/{{moodEntryId}}"
+					}
+				},
+				{
+					"name": "Update mood entry",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"mood_score\": 5,\n  \"mood_label\": \"great\"\n}"
+						},
+						"url": "{{baseUrl}}/api/mood-entries/{{moodEntryId}}"
+					}
+				},
+				{
+					"name": "Delete mood entry",
+					"request": {
+						"method": "DELETE",
+						"header": [{ "key": "Accept", "value": "application/json" }],
+						"url": "{{baseUrl}}/api/mood-entries/{{moodEntryId}}"
+					}
+				}
+			]
+		}
+	]
+}
