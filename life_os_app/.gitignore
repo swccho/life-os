@@ -1,0 +1,2 @@
+# Monorepo: Flutter/Dart/Android ignore rules are in the repository root `.gitignore`.
+# Platform-specific rules remain under `android/.gitignore`, `ios/.gitignore`, etc.
