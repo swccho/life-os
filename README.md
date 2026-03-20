@@ -1,68 +1,109 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# LifeOS — Backend API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+REST API for the LifeOS personal productivity app: **tasks**, **habits** (with logs), **journal**, **mood**, and a **dashboard** summary. Built with **Laravel 12**, **PHP 8.2+**, and **Laravel Sanctum** (Bearer tokens).
 
-## About Laravel
+## Requirements
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- PHP 8.2+ with extensions: `mbstring`, `openssl`, `pdo`, `pdo_mysql`, `tokenizer`, `xml`, `ctype`, `json`
+- [Composer](https://getcomposer.org/)
+- MySQL 8.x (or compatible)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Local setup
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+1. Clone the repository and install dependencies:
 
-## Learning Laravel
+   ```bash
+   composer install
+   ```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+2. Environment:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
 
-## Laravel Sponsors
+3. Configure **MySQL** in `.env` (example):
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+   ```env
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=lifeos_db
+   DB_USERNAME=root
+   DB_PASSWORD=
+   ```
 
-### Premium Partners
+4. Create the database, then migrate:
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+   ```bash
+   php artisan migrate
+   ```
 
-## Contributing
+   Optional: `php artisan db:seed` if seeders are configured.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+5. Run the application:
 
-## Code of Conduct
+   ```bash
+   php artisan serve
+   ```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+   With **Laragon**, point a virtual host at the `public` directory or use `http://127.0.0.1:8000` after `artisan serve`.
 
-## Security Vulnerabilities
+## API overview
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+- **Base URL**: `{APP_URL}/api` (e.g. `http://127.0.0.1:8000/api`)
+- **Auth**: `POST /api/register`, `POST /api/login` (no token). All other routes use `Authorization: Bearer {token}`.
+- **JSON shape** (success): `{ "success": true, "message": string, "data": ... }` — paginated list responses may include `"meta"`.
+- **JSON shape** (validation error): `{ "success": false, "message": string, "errors": { ... } }`.
 
-## LifeOS: running automated tests
+Main route groups:
 
-PHPUnit is configured in [`phpunit.xml`](phpunit.xml) to use **MySQL** with database **`lifeos_testing`** (separate from your app DB in `.env`, e.g. `lifeos_db`). Create that database once (`CREATE DATABASE lifeos_testing;`), then run:
+| Area | Routes |
+|------|--------|
+| Auth | `POST /register`, `POST /login`, `POST /logout`, `GET /me` |
+| Dashboard | `GET /dashboard` |
+| Tasks | `apiResource` `tasks` |
+| Habits | `apiResource` `habits`; `GET/POST /habits/{id}/logs`; `DELETE /habit-logs/{id}` |
+| Journal | `apiResource` `journal-entries` (query: `entry_date`, `from`, `to`) |
+| Mood | `apiResource` `mood-entries` (same date filters) |
+
+See [`routes/api.php`](routes/api.php) for the canonical list.
+
+### Postman
+
+Import [`postman/LifeOS.postman_collection.json`](postman/LifeOS.postman_collection.json). Set collection variable **`baseUrl`** to your app origin (no trailing slash). **Register** or **Login** saves **`accessToken`** for Bearer auth on other requests.
+
+## Documentation
+
+- [MVP database blueprint](docs/LifeOS_MVP_Database_Design_Blueprint.md)
+- [Product documentation](docs/LifeOS_Product_Documentation.md)
+
+## Tests
+
+PHPUnit uses **MySQL** and a dedicated database **`lifeos_testing`** (see [`phpunit.xml`](phpunit.xml)) so migrations do not touch your dev database.
+
+Create the database once:
+
+```sql
+CREATE DATABASE lifeos_testing;
+```
+
+Adjust `DB_*` in `phpunit.xml` if your MySQL user/password differ from the defaults.
+
+Run:
 
 ```bash
 php artisan test
 ```
 
-If you prefer env-file overrides, copy [`.env.testing.example`](.env.testing.example) to `.env.testing` and set `APP_KEY` (same as `.env` is fine for local testing).
+Optional: copy [`.env.testing.example`](.env.testing.example) to `.env.testing` and set `APP_KEY` if you prefer file-based overrides.
+
+## Code style
+
+```bash
+vendor/bin/pint
+```
 
 ## License
 
