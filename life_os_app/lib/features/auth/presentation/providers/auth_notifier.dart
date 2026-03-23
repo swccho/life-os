@@ -113,12 +113,29 @@ class AuthNotifier extends Notifier<AuthState> {
     try {
       await ref.read(authRepositoryProvider).logout();
     } finally {
-      state = const AuthState(sessionStatus: AuthSessionStatus.unauthenticated);
+      state = const AuthState(
+        sessionStatus: AuthSessionStatus.unauthenticated,
+        isBusy: false,
+      );
     }
+  }
+
+  /// Clears session after 401 from the API (token already removed by interceptor).
+  void handleUnauthorized() {
+    state = const AuthState(
+      sessionStatus: AuthSessionStatus.unauthenticated,
+      isBusy: false,
+    );
   }
 
   void clearError() {
     state = state.copyWith(clearError: true);
+  }
+
+  /// After a successful profile API update, sync the in-memory user.
+  void applyUpdatedUser(UserModel user) {
+    if (state.sessionStatus != AuthSessionStatus.authenticated) return;
+    state = state.copyWith(user: user);
   }
 }
 

@@ -33,6 +33,14 @@ class DashboardService
             ->whereDate('logged_date', $today)
             ->count();
 
+        $journalEntriesCount = $user->journalEntries()->count();
+
+        $latestHabitLog = $user->habitLogs()
+            ->with('habit')
+            ->orderByDesc('logged_date')
+            ->orderByDesc('id')
+            ->first();
+
         $latestJournalEntry = $user->journalEntries()
             ->orderByDesc('entry_date')
             ->orderByDesc('id')
@@ -71,6 +79,8 @@ class DashboardService
             'in_progress_tasks' => $inProgressTasks,
             'active_habits_count' => $activeHabitsCount,
             'today_habit_logs_count' => $todayHabitLogsCount,
+            'journal_entries_count' => $journalEntriesCount,
+            'latest_habit_activity' => $latestHabitLog,
             'latest_journal_entry' => $latestJournalEntry,
             'latest_mood_entry' => $latestMoodEntry,
             'average_mood_last_7_days' => $avgMood !== null ? round((float) $avgMood, 2) : null,

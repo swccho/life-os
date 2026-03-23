@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\HabitLog;
 use App\Models\JournalEntry;
 use App\Models\MoodEntry;
 use App\Models\Task;
@@ -26,6 +27,9 @@ class DashboardResource extends JsonResource
         /** @var Collection<int, MoodEntry> $recentMood */
         $recentMood = $d['recent_mood_entries'];
 
+        /** @var HabitLog|null $latestHabitActivity */
+        $latestHabitActivity = $d['latest_habit_activity'];
+
         return [
             'total_tasks' => $d['total_tasks'],
             'completed_tasks' => $d['completed_tasks'],
@@ -33,6 +37,16 @@ class DashboardResource extends JsonResource
             'in_progress_tasks' => $d['in_progress_tasks'],
             'active_habits_count' => $d['active_habits_count'],
             'today_habit_logs_count' => $d['today_habit_logs_count'],
+            'journal_entries_count' => $d['journal_entries_count'],
+            'latest_habit_activity' => $latestHabitActivity
+                ? [
+                    'id' => $latestHabitActivity->id,
+                    'habit_id' => $latestHabitActivity->habit_id,
+                    'habit_title' => $latestHabitActivity->habit?->name ?? '',
+                    'logged_date' => $latestHabitActivity->logged_date?->format('Y-m-d'),
+                    'count' => $latestHabitActivity->count,
+                ]
+                : null,
             'latest_journal_entry' => $d['latest_journal_entry']
                 ? (new JournalEntryResource($d['latest_journal_entry']))->resolve()
                 : null,

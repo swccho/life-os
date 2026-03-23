@@ -4,8 +4,9 @@ import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:flutter/foundation.dart';
 
-/// Laragon / local HTTPS often uses certs that don't match IP (`10.0.2.2`) or
-/// aren't in the device trust store. Accept only in debug for common local hosts.
+/// Local HTTPS (Laragon, emulator IP, etc.) may use certs that don't match the
+/// connection host or aren't trusted. In debug only, accept common dev hosts.
+/// Release/profile use normal certificate validation (e.g. production API).
 void configureLocalDevTls(Dio dio) {
   if (kReleaseMode || kProfileMode) return;
 

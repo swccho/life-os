@@ -14,7 +14,7 @@ REST API for LifeOS: tasks, habits (with daily logs), journal entries, mood entr
 
 ## API
 
-- Base path: `/api` (e.g. `http://127.0.0.1:8000/api`)
+- Base path: `/api` — production: `https://life.os.thethemeai.com/api`; local: e.g. `http://127.0.0.1:8000/api`
 - Register / login: `POST /api/register`, `POST /api/login` — other routes need `Authorization: Bearer {token}`
 - Success body: `success`, `message`, `data` (lists may include `meta` for pagination)
 - Validation errors: `success`, `message`, `errors`

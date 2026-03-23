@@ -5,14 +5,11 @@ import '../../app/config/app_config.dart';
 String resolveApiBaseUrl() {
   const fromEnv = String.fromEnvironment('LIFE_OS_API_BASE_URL');
   if (fromEnv.isNotEmpty) return fromEnv;
-  if (Platform.isAndroid) {
-    // Emulator cannot see Windows hosts; 10.0.2.2 is the host loopback.
-    return 'https://life-os.test/api';
-  }
   return AppConfig.apiPublicBaseUrl;
 }
 
-/// Laragon routes by hostname; when using an IP as the URL host, preserve the vhost.
+/// When the URL host is an IP, send [AppConfig.apiVirtualHost] as `Host` so
+/// virtual-host routing (e.g. Laragon) still matches production hostname.
 Map<String, String> apiExtraHeaders() {
   if (!Platform.isAndroid) return const {};
   final uri = Uri.parse(resolveApiBaseUrl());

@@ -1,16 +1,18 @@
-/// App-wide API configuration for Laravel (Laragon / Valet).
+/// App-wide API configuration for the LifeOS Laravel backend.
 ///
-/// **Android emulator:** The app resolves the API via [apiPublicBaseUrl] on most
-/// platforms, but on Android it uses `https://10.0.2.2/api` plus a `Host` header
-/// so Laragon still routes to `life-os.test` (see [apiVirtualHost]).
-///
-/// **Physical Android device:** run with
-/// `flutter run --dart-define=LIFE_OS_API_BASE_URL=https://YOUR_LAN_IP/api`
-/// (same `Host` header is added when the URL host is an IPv4 address).
+/// Default target is **production**. For local development, run with:
+/// `flutter run --dart-define=LIFE_OS_API_BASE_URL=https://your-local-host/api`
 abstract final class AppConfig {
-  /// URL when the OS resolves `life-os.test` (desktop, iOS simulator, browser).
-  static const String apiPublicBaseUrl = 'https://life-os.test/api';
+  /// Public API base (Dio [BaseOptions.baseUrl]); includes `/api` prefix.
+  static const String apiPublicBaseUrl = 'https://life.os.thethemeai.com/api';
 
-  /// Virtual host name Laragon uses for this project (SNI / HTTP Host).
-  static const String apiVirtualHost = 'life-os.test';
+  /// HTTP `Host` header when the request URL uses an IP (e.g. Android emulator
+  /// `10.0.2.2` or a LAN IP) so the server still routes to this vhost.
+  static const String apiVirtualHost = 'life.os.thethemeai.com';
+
+  /// When true, feature repositories may use local mock data instead of the API.
+  static const bool useMockData = bool.fromEnvironment(
+    'LIFE_OS_USE_MOCK_DATA',
+    defaultValue: false,
+  );
 }

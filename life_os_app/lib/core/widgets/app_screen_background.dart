@@ -1,3 +1,5 @@
+import 'dart:math' show max;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -16,6 +18,15 @@ class AppScreenBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final mq = MediaQuery.of(context);
+    // Edge-to-edge Android often reports padding.top == 0 while icons still draw
+    // in viewPadding; ensure we reserve at least that space below the status bar.
+    final minInsets = EdgeInsets.only(
+      top: max(mq.viewPadding.top, mq.padding.top),
+      left: max(mq.viewPadding.left, mq.padding.left),
+      right: max(mq.viewPadding.right, mq.padding.right),
+    );
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light.copyWith(
         statusBarColor: Colors.transparent,
@@ -96,6 +107,7 @@ class AppScreenBackground extends StatelessWidget {
               ),
             ),
             SafeArea(
+              minimum: minInsets,
               child: Padding(
                 padding: padding ?? EdgeInsets.zero,
                 child: child,

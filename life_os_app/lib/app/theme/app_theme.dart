@@ -7,8 +7,9 @@ import 'tokens/app_typography.dart';
 
 abstract final class AppTheme {
   /// Primary app theme — premium dark, neon accents, glass-friendly surfaces.
-  static ThemeData dark() {
-    const scheme = ColorScheme(
+  /// [accentSeed] optionally recolors primary actions while keeping surfaces.
+  static ThemeData dark({Color? accentSeed}) {
+    const baseScheme = ColorScheme(
       brightness: Brightness.dark,
       primary: AppColors.neonPrimary,
       onPrimary: AppColors.onNeon,
@@ -45,6 +46,23 @@ abstract final class AppTheme {
       inversePrimary: Color(0xFF2563EB),
       surfaceTint: AppColors.neonPrimary,
     );
+
+    final ColorScheme scheme;
+    if (accentSeed != null) {
+      final d = ColorScheme.fromSeed(
+        seedColor: accentSeed,
+        brightness: Brightness.dark,
+      );
+      scheme = baseScheme.copyWith(
+        primary: d.primary,
+        onPrimary: d.onPrimary,
+        primaryContainer: d.primaryContainer,
+        onPrimaryContainer: d.onPrimaryContainer,
+        surfaceTint: d.primary,
+      );
+    } else {
+      scheme = baseScheme;
+    }
 
     final baseText = ThemeData(brightness: Brightness.dark).textTheme;
     final textTheme = AppTypography.textTheme(baseText);
@@ -88,11 +106,11 @@ abstract final class AppTheme {
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           elevation: 0,
-          shadowColor: AppColors.neonPrimary.withValues(alpha: 0.45),
-          backgroundColor: AppColors.neonPrimary,
-          foregroundColor: AppColors.onNeon,
-          disabledBackgroundColor: AppColors.neonPrimary.withValues(alpha: 0.35),
-          disabledForegroundColor: AppColors.onNeon.withValues(alpha: 0.5),
+          shadowColor: scheme.primary.withValues(alpha: 0.45),
+          backgroundColor: scheme.primary,
+          foregroundColor: scheme.onPrimary,
+          disabledBackgroundColor: scheme.primary.withValues(alpha: 0.35),
+          disabledForegroundColor: scheme.onPrimary.withValues(alpha: 0.5),
           minimumSize: const Size.fromHeight(52),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           shape: RoundedRectangleBorder(
@@ -103,7 +121,7 @@ abstract final class AppTheme {
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.neonPrimary,
+          foregroundColor: scheme.primary,
           side: BorderSide(color: AppColors.glassBorder),
           minimumSize: const Size.fromHeight(52),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
@@ -115,7 +133,7 @@ abstract final class AppTheme {
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: AppColors.neonPrimary,
+          foregroundColor: scheme.primary,
           textStyle: textTheme.titleSmall,
         ),
       ),
@@ -133,7 +151,7 @@ abstract final class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: radiusMd,
-          borderSide: const BorderSide(color: AppColors.neonPrimary, width: 2),
+          borderSide: BorderSide(color: scheme.primary, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: radiusMd,

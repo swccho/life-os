@@ -29,6 +29,8 @@ class DashboardTest extends TestCase
                     'in_progress_tasks',
                     'active_habits_count',
                     'today_habit_logs_count',
+                    'journal_entries_count',
+                    'latest_habit_activity',
                     'latest_journal_entry',
                     'latest_mood_entry',
                     'average_mood_last_7_days',

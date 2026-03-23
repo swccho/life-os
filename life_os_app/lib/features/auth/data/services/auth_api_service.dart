@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 
 import '../../../../core/network/api_exception.dart';
+import '../../../../core/network/api_response_parser.dart';
+import '../../../../core/network/network_exceptions.dart';
 import '../models/auth_response_model.dart';
 import '../models/user_model.dart';
 
@@ -27,7 +29,7 @@ class AuthApiService {
       );
       return _parseAuthResponse(response.data!);
     } on DioException catch (e) {
-      throw _mapDio(e);
+      throw NetworkExceptions.fromDio(e);
     }
   }
 
@@ -42,7 +44,7 @@ class AuthApiService {
       );
       return _parseAuthResponse(response.data!);
     } on DioException catch (e) {
-      throw _mapDio(e);
+      throw NetworkExceptions.fromDio(e);
     }
   }
 
@@ -50,15 +52,24 @@ class AuthApiService {
     try {
       await _dio.post<Map<String, dynamic>>('/logout');
     } on DioException catch (e) {
-      throw _mapDio(e);
+      throw NetworkExceptions.fromDio(e);
     }
   }
 
-  Future<UserModel> me() async {
+  Future<UserModel> updateProfile({
+    required String name,
+    String? bio,
+  }) async {
     try {
-      final response = await _dio.get<Map<String, dynamic>>('/me');
+      final response = await _dio.patch<Map<String, dynamic>>(
+        '/profile',
+        data: {
+          'name': name,
+          'bio': bio,
+        },
+      );
       final data = response.data!;
-      _ensureSuccess(data);
+      ApiResponseParser.ensureSuccess(data);
       final inner = data['data'] as Map<String, dynamic>?;
       if (inner == null) {
         throw ApiException('Invalid response from server.');
@@ -69,67 +80,35 @@ class AuthApiService {
       }
       return UserModel.fromJson(userJson);
     } on DioException catch (e) {
-      throw _mapDio(e);
+      throw NetworkExceptions.fromDio(e);
+    }
+  }
+
+  Future<UserModel> me() async {
+    try {
+      final response = await _dio.get<Map<String, dynamic>>('/me');
+      final data = response.data!;
+      ApiResponseParser.ensureSuccess(data);
+      final inner = data['data'] as Map<String, dynamic>?;
+      if (inner == null) {
+        throw ApiException('Invalid response from server.');
+      }
+      final userJson = inner['user'] as Map<String, dynamic>?;
+      if (userJson == null) {
+        throw ApiException('Invalid response from server.');
+      }
+      return UserModel.fromJson(userJson);
+    } on DioException catch (e) {
+      throw NetworkExceptions.fromDio(e);
     }
   }
 
   AuthResponseModel _parseAuthResponse(Map<String, dynamic> data) {
-    _ensureSuccess(data);
+    ApiResponseParser.ensureSuccess(data);
     final inner = data['data'] as Map<String, dynamic>?;
     if (inner == null) {
       throw ApiException('Invalid response from server.');
     }
     return AuthResponseModel.fromJson(inner);
   }
-
-  void _ensureSuccess(Map<String, dynamic> data) {
-    final success = data['success'] as bool?;
-    if (success == false) {
-      final message = data['message'] as String? ?? 'Request failed';
-      throw ApiException(message);
-    }
-  }
-
-  static ApiException _mapDio(DioException e) {
-    final response = e.response;
-    if (response?.data is Map<String, dynamic>) {
-      final map = response!.data as Map<String, dynamic>;
-      final message = map['message'] as String?;
-      if (message != null && message.isNotEmpty) {
-        final errors = map['errors'];
-        if (errors is Map<String, dynamic> && errors.isNotEmpty) {
-          final first = errors.values.first;
-          if (first is List && first.isNotEmpty) {
-            return ApiException(
-              first.first as String,
-              statusCode: response.statusCode,
-            );
-          }
-        }
-        return ApiException(message, statusCode: response.statusCode);
-      }
-    }
-    if (e.type == DioExceptionType.connectionTimeout ||
-        e.type == DioExceptionType.sendTimeout ||
-        e.type == DioExceptionType.receiveTimeout) {
-      return ApiException(
-        'Connection timed out. Check your network.',
-        statusCode: statusCodeFrom(e),
-      );
-    }
-    if (e.type == DioExceptionType.connectionError) {
-      return ApiException(
-        'Could not reach the API server. Ensure Laragon is running and '
-        'AppConfig.apiPublicBaseUrl is correct. On a physical phone, try '
-        '--dart-define=LIFE_OS_API_BASE_URL=https://life-os.test/api',
-        statusCode: statusCodeFrom(e),
-      );
-    }
-    return ApiException(
-      e.message ?? 'Something went wrong.',
-      statusCode: statusCodeFrom(e),
-    );
-  }
-
-  static int? statusCodeFrom(DioException e) => e.response?.statusCode;
 }

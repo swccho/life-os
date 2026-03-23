@@ -45,4 +45,10 @@ class AuthRepository {
   }
 
   Future<UserModel> getCurrentUser() => _api.me();
+
+  Future<UserModel> updateProfile({
+    required String name,
+    String? bio,
+  }) =>
+      _api.updateProfile(name: name, bio: bio);
 }

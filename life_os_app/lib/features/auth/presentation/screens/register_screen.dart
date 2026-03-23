@@ -29,7 +29,16 @@ class _RegisterScreenStateImpl extends ConsumerState<RegisterScreen> {
   bool _obscureConfirm = true;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(authNotifierProvider.notifier).clearError();
+    });
+  }
+
+  @override
   void dispose() {
+    ref.read(authNotifierProvider.notifier).clearError();
     _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();

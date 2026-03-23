@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "a1b2c3d4-lifeos-api",
 		"name": "LifeOS API",
-		"description": "Laravel 12 + Sanctum API for LifeOS. Set **baseUrl** (e.g. `http://127.0.0.1:8000` or your Laragon vhost). Run **Register** or **Login** first; the collection saves **accessToken** automatically.\n\nJSON envelope: `{ success, message, data, meta? }`. Errors: `{ success, message, errors? }`.",
+		"description": "Laravel 12 + Sanctum API for LifeOS. Set **baseUrl** (production: `https://life.os.thethemeai.com`, or local e.g. `http://127.0.0.1:8000`). Run **Register** or **Login** first; the collection saves **accessToken** automatically.\n\nJSON envelope: `{ success, message, data, meta? }`. Errors: `{ success, message, errors? }`.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"auth": {
@@ -16,7 +16,7 @@
 		]
 	},
 	"variable": [
-		{ "key": "baseUrl", "value": "http://127.0.0.1:8000" },
+		{ "key": "baseUrl", "value": "https://life.os.thethemeai.com" },
 		{ "key": "accessToken", "value": "" },
 		{ "key": "taskId", "value": "1" },
 		{ "key": "habitId", "value": "1" },

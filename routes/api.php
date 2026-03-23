@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\Auth\AuthController;
+use App\Http\Controllers\Api\Profile\ProfileController;
 use App\Http\Controllers\Api\Dashboard\DashboardController;
 use App\Http\Controllers\Api\Habits\HabitController;
 use App\Http\Controllers\Api\Habits\HabitLogController;
@@ -17,6 +18,7 @@ Route::middleware('throttle:20,1')->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
+    Route::patch('/profile', [ProfileController::class, 'update']);
 
     Route::get('/dashboard', [DashboardController::class, 'index']);
 
